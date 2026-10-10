@@ -1,0 +1,43 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: gym_db
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: ./web
+    container_name: gym_web
+    restart: unless-stopped
+    ports:
+      - "8082:80"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2.1
+    container_name: gym_pma
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      UPLOAD_LIMIT: 50M
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:
