@@ -22,7 +22,7 @@ $display_role = isset($_SESSION["role"]) ? ($role_names[$_SESSION["role"]] ?? $_
 </head>
 <body>
     <?php if (isset($_SESSION["user_id"])): ?>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4 shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="index.php"><i class="fas fa-dumbbell text-warning me-2"></i>GYM FITNESS</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -44,7 +44,7 @@ $display_role = isset($_SESSION["role"]) ? ($role_names[$_SESSION["role"]] ?? $_
                 <div class="d-flex align-items-center">
                     <span class="navbar-text me-3 text-light small">
                         Xin chào, <strong><?php echo htmlspecialchars($_SESSION["username"] ?? ""); ?></strong> 
-                        <span class="badge bg-primary ms-1"><?php echo htmlspecialchars($display_role); ?></span>
+                        <span class="role-badge ms-1"><?php echo htmlspecialchars($display_role); ?></span>
                     </span>
                     <a class="btn btn-outline-danger btn-sm" href="logout.php"><i class="fas fa-sign-out-alt me-1"></i>Đăng xuất</a>
                 </div>
