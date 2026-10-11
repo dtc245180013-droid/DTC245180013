@@ -3,6 +3,13 @@ services:
     image: mysql:8.0
     container_name: gym_db
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -18,7 +25,7 @@ services:
       retries: 10
       start_period: 10s
     networks:
-      - gym_net
+      - backend
 
   web:
     build:
@@ -26,18 +33,34 @@ services:
     image: gym-web:latest
     container_name: gym_web
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
     depends_on:
       db:
         condition: service_healthy
     env_file:
       - .env
     networks:
-      - gym_net
+      - frontend
+      - backend
+      - monitoring
 
   phpmyadmin:
     image: phpmyadmin:5.2.1
     container_name: gym_pma
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
     environment:
       PMA_HOST: db
       PMA_USER: ${MYSQL_USER}
@@ -47,12 +70,20 @@ services:
       db:
         condition: service_healthy
     networks:
-      - gym_net
+      - frontend
+      - backend
 
   nginx:
     image: nginx:1.27-alpine
     container_name: gym_nginx
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
     ports:
       - "80:80"
       - "443:443"
@@ -63,13 +94,21 @@ services:
       - web
       - phpmyadmin
     networks:
-      - gym_net
+      - frontend
+      - monitoring
 
   # === MONITORING STACK (STEP 4) ===
   prometheus:
     image: prom/prometheus:v2.53.0
     container_name: gym_prometheus
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -80,12 +119,19 @@ services:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
     networks:
-      - gym_net
+      - monitoring
 
   grafana:
     image: grafana/grafana:11.1.0
     container_name: gym_grafana
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
@@ -98,13 +144,19 @@ services:
     depends_on:
       - prometheus
     networks:
-      - gym_net
+      - frontend
+      - monitoring
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: gym_cadvisor
     restart: unless-stopped
     privileged: true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
@@ -114,7 +166,7 @@ services:
     devices:
       - /dev/kmsg
     networks:
-      - gym_net
+      - monitoring
 
   nginx-exporter:
     image: nginx/nginx-prometheus-exporter:1.1.0
@@ -125,7 +177,8 @@ services:
     depends_on:
       - nginx
     networks:
-      - gym_net
+      - frontend
+      - monitoring
 
   mysqld-exporter:
     image: prom/mysqld-exporter:v0.15.1
@@ -139,7 +192,8 @@ services:
       db:
         condition: service_healthy
     networks:
-      - gym_net
+      - backend
+      - monitoring
 
   # === LOGGING & ALERTING STACK (STEP 5) ===
   loki:
@@ -147,11 +201,16 @@ services:
     container_name: gym_loki
     restart: unless-stopped
     command: -config.file=/etc/loki/loki-config.yaml
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
     volumes:
       - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
       - loki_data:/loki
     networks:
-      - gym_net
+      - monitoring
 
   promtail:
     image: grafana/promtail:3.1.0
@@ -165,7 +224,7 @@ services:
     depends_on:
       - loki
     networks:
-      - gym_net
+      - monitoring
 
   alert-sink:
     build:
@@ -173,8 +232,10 @@ services:
     image: gym-alert-sink:latest
     container_name: gym_alert_sink
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     networks:
-      - gym_net
+      - monitoring
 
 volumes:
   db_data:
@@ -183,5 +244,10 @@ volumes:
   loki_data:
 
 networks:
-  gym_net:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true
+  monitoring:
     driver: bridge
