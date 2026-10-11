@@ -1,0 +1,69 @@
+=== 1. docker compose ps ===
+NAME        IMAGE               COMMAND                  SERVICE      CREATED          STATUS                    PORTS
+gym_db      mysql:8.0           "docker-entrypoint.s…"   db           25 seconds ago   Up 22 seconds (healthy)   3306/tcp, 33060/tcp
+gym_nginx   nginx:1.27-alpine   "/docker-entrypoint.…"   nginx        22 seconds ago   Up 15 seconds             0.0.0.0:80->80/tcp, [::]:80->80/tcp, 0.0.0.0:443->443/tcp, [::]:443->443/tcp
+gym_pma     phpmyadmin:5.2.1    "/docker-entrypoint.…"   phpmyadmin   23 seconds ago   Up 16 seconds             80/tcp
+gym_web     gym-web:latest      "docker-php-entrypoi…"   web          23 seconds ago   Up 16 seconds             80/tcp
+
+=== 2. nginx -t test ===
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+=== 3. HTTP 301 Redirect test ===
+HTTP/1.1 301 Moved Permanently
+Server: nginx
+Date: Sun, 11 Oct 2026 05:32:40 GMT
+Content-Type: text/html
+Content-Length: 162
+Connection: keep-alive
+Location: https://localhost/
+
+
+=== 4. HTTPS Security Headers test ===
+HTTP/1.1 302 Found
+Server: nginx
+Date: Sun, 11 Oct 2026 05:32:40 GMT
+Content-Type: text/html; charset=UTF-8
+Connection: keep-alive
+X-Powered-By: PHP/8.2.34
+Set-Cookie: PHPSESSID=859194cd7123e27c2d4dcb918a4442ac; path=/
+Expires: Thu, 19 Nov 1981 08:52:00 GMT
+Cache-Control: no-store, no-cache, must-revalidate
+Pragma: no-cache
+Location: login.php
+X-Frame-Options: SAMEORIGIN
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Referrer-Policy: strict-origin-when-cross-origin
+
+=== 5. HTTPS phpMyAdmin test ===
+HTTP/1.1 200 OK
+Server: nginx
+Date: Sun, 11 Oct 2026 05:32:40 GMT
+Content-Type: text/html; charset=utf-8
+Connection: keep-alive
+Vary: Accept-Encoding
+X-Powered-By: PHP/8.2.27
+Set-Cookie: phpMyAdmin_https=da290e102bf7ff390cdd760e2dc1b2d5; path=/phpmyadmin/; secure; HttpOnly; SameSite=Strict
+Expires: Sun, 11 Oct 2026 05:32:40 +0000
+Cache-Control: no-store, no-cache, must-revalidate, pre-check=0, post-check=0, max-age=0
+
+=== 6. SSL Certificate info ===
+subject=C=VN, ST=Hanoi, L=Hanoi, O=GymFitness, OU=IT, CN=192.168.233.128
+notBefore=Oct 11 05:31:10 2026 GMT
+notAfter=Oct 11 05:31:10 2027 GMT
+
+=== 7. HTTPS Login simulation ===
+Extracted CSRF token: c7310c2645bb80607b12661fd10859f1a1d7325a722b8602e8c33fe6f8eb2bcd
+
+=== 8. Closed Ports Verification ===
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0  0      0   0      0   0      0      0      0                              0  0      0   0      0   0      0      0      0                              0  0      0   0      0   0      0      0      0                              0
+HTTP/1.1 404 Not Found
+Date: Sun, 11 Oct 2026 05:32:41 GMT
+
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0
+curl: (7) Failed to connect to localhost port 8081 after 0 ms: Could not connect to server
+Port 8081: Connection refused (Closed as expected)
