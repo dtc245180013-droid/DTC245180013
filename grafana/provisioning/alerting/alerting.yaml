@@ -1,0 +1,79 @@
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: alert-sink-webhook
+    receivers:
+      - uid: alert-sink-rcv
+        type: webhook
+        settings:
+          url: http://alert-sink:8080/
+          httpMethod: POST
+
+policies:
+  - orgId: 1
+    receiver: alert-sink-webhook
+    group_by: ['alertname']
+    group_wait: 5s
+    group_interval: 10s
+    repeat_interval: 12h
+
+groups:
+  - orgId: 1
+    name: GymSecurityAlerts
+    folder: Security Alerts
+    interval: 10s
+    rules:
+      - uid: brute-force-rule
+        title: 'GYM - Brute force login'
+        condition: C
+        data:
+          - refId: A
+            queryType: range
+            relativeTimeRange:
+              from: 60
+              to: 0
+            datasourceUid: loki
+            model:
+              editorMode: code
+              expr: 'count_over_time({job="webapp"} |= "LOGIN_FAILED" [1m])'
+              instant: false
+              range: true
+          - refId: B
+            queryType: reduce
+            datasourceUid: '__expr__'
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: sum
+              type: reduce
+          - refId: C
+            queryType: threshold
+            datasourceUid: '__expr__'
+            model:
+              conditions:
+                - evaluator:
+                    params: [5]
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: [B]
+                  reducer:
+                    params: []
+                    type: last
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              type: threshold
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: 'Brute force login attack detected'
+          description: 'More than 5 failed logins within 1 minute. Check IP and target user via Loki LogQL.'
+        labels:
+          severity: critical

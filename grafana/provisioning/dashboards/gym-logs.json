@@ -1,0 +1,104 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": true,
+  "panels": [
+    {
+      "title": "S\u1ed1 L\u1ea7n \u0110\u0103ng Nh\u1eadp Th\u1ea5t B\u1ea1i (LOGIN_FAILED) Theo Ph\u00fat",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "Loki"
+          },
+          "editorMode": "code",
+          "expr": "sum(count_over_time({job=\"webapp\"} |= \"LOGIN_FAILED\" [1m]))",
+          "legendFormat": "L\u01b0\u1ee3t Th\u1ea5t B\u1ea1i / Ph\u00fat",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "M\u00e3 Tr\u1ea1ng Th\u00e1i HTTP Nginx (Status Codes)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "Loki"
+          },
+          "editorMode": "code",
+          "expr": "sum by (status) (count_over_time({job=\"nginx\"} | pattern `<ip> - <user> [<time>] \"<method> <uri> <proto>\" <status> <bytes> \"<referer>\" \"<agent>\" \"<forward>\" rt=<rt>` [1m]))",
+          "legendFormat": "HTTP {{status}}",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Nh\u1eadt K\u00fd \u1ee8ng D\u1ee5ng Web (Real-time Logs)",
+      "type": "logs",
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "Loki"
+          },
+          "editorMode": "code",
+          "expr": "{job=\"webapp\"}",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showLabels": false,
+        "wrapLogMessage": true,
+        "enableLogDetails": true,
+        "sortOrder": "Descending"
+      }
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": [
+    "gym",
+    "logs",
+    "loki"
+  ],
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "GYM - Logs",
+  "uid": "gym-logs",
+  "version": 1
+}

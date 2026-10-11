@@ -141,10 +141,46 @@ services:
     networks:
       - gym_net
 
+  # === LOGGING & ALERTING STACK (STEP 5) ===
+  loki:
+    image: grafana/loki:3.1.0
+    container_name: gym_loki
+    restart: unless-stopped
+    command: -config.file=/etc/loki/loki-config.yaml
+    volumes:
+      - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+      - loki_data:/loki
+    networks:
+      - gym_net
+
+  promtail:
+    image: grafana/promtail:3.1.0
+    container_name: gym_promtail
+    restart: unless-stopped
+    command: -config.file=/etc/promtail/promtail-config.yaml
+    volumes:
+      - ./promtail/promtail-config.yaml:/etc/promtail/promtail-config.yaml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    depends_on:
+      - loki
+    networks:
+      - gym_net
+
+  alert-sink:
+    build:
+      context: ./alert-sink
+    image: gym-alert-sink:latest
+    container_name: gym_alert_sink
+    restart: unless-stopped
+    networks:
+      - gym_net
+
 volumes:
   db_data:
   prometheus_data:
   grafana_data:
+  loki_data:
 
 networks:
   gym_net:
