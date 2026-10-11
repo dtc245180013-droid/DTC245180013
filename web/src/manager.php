@@ -90,9 +90,9 @@ $new_members = $pdo->query("SELECT COUNT(*) as c FROM users WHERE role='member' 
 $fill_rate = $pdo->query("SELECT (SELECT COUNT(*) FROM bookings) / NULLIF(SUM(capacity), 0) as rate FROM schedules")->fetch()["rate"];
 ?>
 <?php require_once "header.php"; ?>
-<?php if (isset(['receipt'])): 
-     = ['receipt'];
-    unset(['receipt']);
+<?php if (isset($_SESSION['receipt'])): 
+    $rc = $_SESSION['receipt'];
+    unset($_SESSION['receipt']);
 ?>
 <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4 border-0" role="alert" style="background-color: #ECFDF5; border-left: 5px solid #10B981 !important;">
     <div class="d-flex align-items-center mb-3">
@@ -109,33 +109,33 @@ $fill_rate = $pdo->query("SELECT (SELECT COUNT(*) FROM bookings) / NULLIF(SUM(ca
             <div class="text-center mb-3">
                 <h4 class="fw-bold text-primary mb-1"><i class="fas fa-dumbbell"></i> GYM FITNESS</h4>
                 <p class="text-muted small mb-0">HÓA ĐƠN THANH TOÁN DỊCH VỤ</p>
-                <small class="text-muted">Mã HĐ: <strong><?php echo ['receipt_no']; ?></strong> | Ngày: <?php echo ['created_at']; ?></small>
+                <small class="text-muted">Mã HĐ: <strong><?php echo $rc['receipt_no']; ?></strong> | Ngày: <?php echo $rc['created_at']; ?></small>
             </div>
             <hr class="my-2" style="border-top: 1px dashed #CBD5E1;">
             <div class="mb-2 small d-flex justify-content-between">
                 <span class="text-muted">Khách hàng:</span>
-                <strong><?php echo htmlspecialchars(['member_name']); ?></strong>
+                <strong><?php echo htmlspecialchars($rc['member_name']); ?></strong>
             </div>
             <div class="mb-2 small d-flex justify-content-between">
                 <span class="text-muted">Gói dịch vụ:</span>
-                <strong><?php echo htmlspecialchars(['package_name']); ?></strong>
+                <strong><?php echo htmlspecialchars($rc['package_name']); ?></strong>
             </div>
             <div class="mb-2 small d-flex justify-content-between">
                 <span class="text-muted">Thời hạn áp dụng:</span>
-                <span><?php echo ['start_date']; ?> đến <?php echo ['end_date']; ?></span>
+                <span><?php echo $rc['start_date']; ?> đến <?php echo $rc['end_date']; ?></span>
             </div>
             <div class="mb-2 small d-flex justify-content-between">
                 <span class="text-muted">Hình thức thanh toán:</span>
-                <span class="badge bg-light text-dark border"><?php echo ['payment_method']; ?></span>
+                <span class="badge bg-light text-dark border"><?php echo $rc['payment_method']; ?></span>
             </div>
             <div class="mb-3 small d-flex justify-content-between">
                 <span class="text-muted">Thu ngân / Người lập:</span>
-                <span><?php echo htmlspecialchars(['cashier']); ?></span>
+                <span><?php echo htmlspecialchars($rc['cashier']); ?></span>
             </div>
             <hr class="my-2" style="border-top: 2px solid #0F172A;">
             <div class="d-flex justify-content-between align-items-center py-2">
                 <span class="fw-bold fs-6">TỔNG TIỀN:</span>
-                <span class="fw-bolder fs-4 text-primary"><?php echo number_format(['price'], 0, ',', '.'); ?> VNĐ</span>
+                <span class="fw-bolder fs-4 text-primary"><?php echo number_format($rc['price'], 0, ',', '.'); ?> VNĐ</span>
             </div>
             <div class="text-center mt-3 no-print">
                 <button onclick="window.print()" class="btn btn-sm btn-primary me-2"><i class="fas fa-print me-1"></i> In Hóa Đơn</button>
