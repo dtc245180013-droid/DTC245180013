@@ -1,11 +1,26 @@
 # Hệ Thống Quản Lý Phòng Gym & Thể Thao (Gym & Fitness Management System)
-### Đồ án DevOps & An Toàn Hệ Thống Phân Tán (Đề 23)
-
-Hệ thống quản lý phòng Gym và thể thao toàn diện được xây dựng trên kiến trúc Multi-Container Docker Compose với đầy đủ các tiêu chuẩn bảo mật, giám sát hiệu năng, thu thập log tập trung và cảnh báo sự cố tự động.
+### Đồ án Môn học: Triển khai và Quản trị Hệ thống Phần mềm (DevOps & An toàn Hệ thống)
+### Đề tài số: 23
 
 ---
 
-## 1. Kiến Trúc Hệ Thống (Architecture)
+## 📌 THÔNG TIN SINH VIÊN THỰC HIỆN
+- **Họ và tên sinh viên:** **Trần Thị Thu Huyền**
+- **Mã số sinh viên (MSSV):** **DTC245180013**
+- **Lớp / Khóa:** Công nghệ Thông tin - K24
+- **Email:** `dtc245180013@ictu.edu.vn`
+- **Tài khoản GitHub:** [`dtc245180013-droid`](https://github.com/dtc245180013-droid)
+- **Repository:** [`https://github.com/dtc245180013-droid/DTC245180013`](https://github.com/dtc245180013-droid/DTC245180013)
+- **Trường:** Đại học Công nghệ Thông tin và Truyền thông – Đại học Thái Nguyên (ICTU)
+
+---
+
+## 1. Giới Thiệu Dự Án
+Hệ thống quản lý phòng Gym và thể thao toàn diện được xây dựng trên kiến trúc Multi-Container Docker Compose với đầy đủ các tiêu chuẩn bảo mật, giám sát hiệu năng thời gian thực, thu thập log tập trung và cảnh báo sự cố an toàn thông tin tự động theo đúng yêu cầu Đề tài 23.
+
+---
+
+## 2. Kiến Trúc Hệ Thống (Architecture Diagram)
 
 ```mermaid
 graph TD
@@ -52,7 +67,7 @@ graph TD
 
 ---
 
-## 2. Công Nghệ Sử Dụng (Tech Stack)
+## 3. Công Nghệ Sử Dụng (Tech Stack)
 
 | Phân hệ | Công nghệ & Phiên bản | Chức năng chính |
 | :--- | :--- | :--- |
@@ -71,16 +86,16 @@ graph TD
 
 ---
 
-## 3. Danh Sách Tài Khoản & Mật Khẩu (Credentials)
+## 4. Danh Sách Tài Khoản & Mật Khẩu (Credentials)
 
-### 3.1. Tài khoản Đăng nhập Ứng dụng Gym (`https://<IP>/login.php`)
+### 4.1. Tài khoản Đăng nhập Ứng dụng Gym (`https://<IP>/login.php`)
 | Vai trò | Tên đăng nhập | Mật khẩu mặc định | Quyền hạn |
 | :--- | :--- | :--- | :--- |
 | **Quản lý (Manager)** | `admin` | `Gym@2026!` | CRUD Hội viên, Gói tập, HLV, Lịch tập, Gia hạn gói, Xuất biên lai, Báo cáo doanh thu |
 | **Huấn luyện viên** | `hlv01` .. `hlv05` | `Gym@2026!` | Xem ca dạy của mình, xem danh sách học viên đăng ký, điểm danh hội viên |
 | **Hội viên (Member)** | `hoivien01` .. `hoivien15` | `Gym@2026!` | Xem hồ sơ gói tập, đặt chỗ lớp tập (SELECT FOR UPDATE chống overbooking), hủy đặt chỗ |
 
-### 3.2. Dịch vụ Hạ tầng & Giám sát
+### 4.2. Dịch vụ Hạ tầng & Giám sát
 - **Grafana URL:** `https://<IP>/grafana/` (hoặc `http://localhost:3000`)
   - Tài khoản: `admin` / Mật khẩu: `GymGrafanaP@ss2026!`
 - **phpMyAdmin URL:** `https://<IP>/phpmyadmin/`
@@ -90,9 +105,9 @@ graph TD
 
 ---
 
-## 4. Hướng Dẫn Cài Đặt & Vận Hành (Quick Start)
+## 5. Hướng Dẫn Cài Đặt & Vận Hành (Quick Start)
 
-### 4.1. Khởi tạo môi trường
+### 5.1. Khởi tạo môi trường
 ```bash
 # 1. Clone repository
 git clone https://github.com/dtc245180013-droid/DTC245180013.git ~/gym
@@ -109,7 +124,7 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-### 4.2. Kiểm tra trạng thái
+### 5.2. Kiểm tra trạng thái
 ```bash
 # Kiểm tra danh sách 12 container
 docker compose ps
@@ -120,15 +135,15 @@ curl -sk https://localhost/health.php
 
 ---
 
-## 5. Giám Sát & Truy Vấn Nhật Ký (Monitoring & LogQL)
+## 6. Giám Sát & Truy Vấn Nhật Ký (Monitoring & LogQL)
 
-### 5.1. Các Dashboard Grafana đã nạp sẵn
+### 6.1. Các Dashboard Grafana đã nạp sẵn
 1. **GYM - Containers:** Giám sát CPU/RAM thực tế của từng container (cAdvisor).
 2. **GYM - Nginx:** Giám sát lưu lượng HTTP request, active connections, status codes.
 3. **GYM - MySQL:** Giám sát số lượng truy vấn, kết nối hiện thời, bộ nhớ đệm InnoDB.
 4. **GYM - Logs:** Truy vấn trực quan log của Webapp và Nginx qua Grafana Loki.
 
-### 5.2. Các truy vấn LogQL mẫu (Thực hiện trong Grafana Explore hoặc Loki API)
+### 6.2. Các truy vấn LogQL mẫu (Thực hiện trong Grafana Explore hoặc Loki API)
 - **Truy vấn lỗi 5xx trên Nginx:**
   ```logql
   {job="nginx"} |~ " (500|502|503|504) "
@@ -148,7 +163,7 @@ curl -sk https://localhost/health.php
 
 ---
 
-## 6. Kịch Bản Giả Lập Tấn Công & Cảnh Báo (Incident Scenario)
+## 7. Kịch Bản Giả Lập Tấn Công & Cảnh Báo (Incident Scenario)
 
 ```bash
 # Chạy script giả lập 20 lượt đăng nhập sai liên tiếp vào tài khoản admin:
@@ -161,7 +176,7 @@ Alert Rule `GYM - Brute force login` trong Grafana sẽ tự động chuyển tr
 
 ---
 
-## 7. Các Biện Pháp Gia Cố Bảo Mật (Security Hardening)
+## 8. Các Biện Pháp Gia Cố Bảo Mật (Security Hardening)
 1. **Phân vùng mạng 3 lớp (Network Segmentation):** Tách biệt `frontend`, `backend` (`internal: true`), và `monitoring`. Database `gym_db` hoàn toàn không bị Nginx hay bên ngoài kết nối trực tiếp.
 2. **Đặc quyền tối thiểu CSDL (Least Privilege):** Tài khoản `gym_app` chỉ có quyền `SELECT, INSERT, UPDATE, DELETE` trên CSDL `gym.*`. Thu hồi toàn bộ quyền `DROP, ALTER, CREATE`.
 3. **Hạn chế đặc quyền & Tài nguyên Container:** Bật `no-new-privileges:true`, giới hạn cứng CPU và RAM cho từng container. Web service chạy với người dùng `www-data`.
