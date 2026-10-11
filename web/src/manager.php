@@ -150,19 +150,19 @@ $fill_rate = $pdo->query("SELECT (SELECT COUNT(*) FROM bookings) / NULLIF(SUM(ca
 <!-- Nav tabs -->
 <ul class="nav nav-tabs mb-4" id="managerTabs" role="tablist">
   <li class="nav-item" role="presentation">
-    <button class="nav-link active" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab" aria-controls="reports" aria-selected="true">Báo cáo (Reports)</button>
+    <button class="nav-link active" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab" aria-controls="reports" aria-selected="true">Báo Cáo Hoạt Động</button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="members-tab" data-bs-toggle="tab" data-bs-target="#members" type="button" role="tab" aria-controls="members" aria-selected="false">Hội viên (Members & Renew)</button>
+    <button class="nav-link" id="members-tab" data-bs-toggle="tab" data-bs-target="#members" type="button" role="tab" aria-controls="members" aria-selected="false">Quản Lý Hội Viên & Gia Hạn</button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="packages-tab" data-bs-toggle="tab" data-bs-target="#packages" type="button" role="tab" aria-controls="packages" aria-selected="false">Gói tập (Packages)</button>
+    <button class="nav-link" id="packages-tab" data-bs-toggle="tab" data-bs-target="#packages" type="button" role="tab" aria-controls="packages" aria-selected="false">Gói Tập Luyện</button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="trainers-tab" data-bs-toggle="tab" data-bs-target="#trainers" type="button" role="tab" aria-controls="trainers" aria-selected="false">Huấn luyện viên (Trainers)</button>
+    <button class="nav-link" id="trainers-tab" data-bs-toggle="tab" data-bs-target="#trainers" type="button" role="tab" aria-controls="trainers" aria-selected="false">Đội Ngũ Huấn Luyện Viên</button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="schedules-tab" data-bs-toggle="tab" data-bs-target="#schedules" type="button" role="tab" aria-controls="schedules" aria-selected="false">Lịch tập (Schedules)</button>
+    <button class="nav-link" id="schedules-tab" data-bs-toggle="tab" data-bs-target="#schedules" type="button" role="tab" aria-controls="schedules" aria-selected="false">Lịch Học & Lớp Luyện Tập</button>
   </li>
 </ul>
 
@@ -174,7 +174,7 @@ $fill_rate = $pdo->query("SELECT (SELECT COUNT(*) FROM bookings) / NULLIF(SUM(ca
         <div class="col-md-4 mb-2">
             <div class="card bg-success text-white shadow-sm h-100">
                 <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-dollar-sign"></i> Total Revenue</h5>
+                    <h5 class="card-title"><i class="fas fa-dollar-sign"></i> Tổng Doanh Thu Phòng Gym</h5>
                     <h3 class="mb-0"><?php echo number_format(($revenue ?? 0) * 25000, 0, ",", "."); ?> VNĐ</h3>
                 </div>
             </div>
@@ -182,7 +182,7 @@ $fill_rate = $pdo->query("SELECT (SELECT COUNT(*) FROM bookings) / NULLIF(SUM(ca
         <div class="col-md-4 mb-2">
             <div class="card bg-info text-white shadow-sm h-100">
                 <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-users"></i> New Members (30 days)</h5>
+                    <h5 class="card-title"><i class="fas fa-users"></i> Hội Viên Mới (30 ngày qua)</h5>
                     <h3 class="mb-0"><?php echo $new_members; ?></h3>
                 </div>
             </div>
@@ -190,7 +190,7 @@ $fill_rate = $pdo->query("SELECT (SELECT COUNT(*) FROM bookings) / NULLIF(SUM(ca
         <div class="col-md-4 mb-2">
             <div class="card bg-warning text-dark shadow-sm h-100">
                 <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-percentage"></i> Avg Fill Rate</h5>
+                    <h5 class="card-title"><i class="fas fa-percentage"></i> Tỷ Lệ Lấp Đầy Lớp Học</h5>
                     <h3 class="mb-0"><?php echo number_format(($fill_rate ?? 0) * 100, 2); ?>%</h3>
                 </div>
             </div>
@@ -198,13 +198,13 @@ $fill_rate = $pdo->query("SELECT (SELECT COUNT(*) FROM bookings) / NULLIF(SUM(ca
     </div>
   </div>
 
-  <!-- Members & Renew Tab -->
+  <!-- Danh Sách Hội Viên & Renew Tab -->
   <div class="tab-pane fade" id="members" role="tabpanel" aria-labelledby="members-tab">
     <div class="row">
-        <!-- Members Section -->
+        <!-- Danh Sách Hội Viên Section -->
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-dark text-white"><h5 class="mb-0">Members</h5></div>
+                <div class="card-header bg-dark text-white"><h5 class="mb-0">Danh Sách Hội Viên</h5></div>
                 <div class="card-body p-0" style="max-height: 300px; overflow-y: auto;">
                     <table class="table table-hover mb-0">
                         <tbody>
@@ -228,27 +228,27 @@ $fill_rate = $pdo->query("SELECT (SELECT COUNT(*) FROM bookings) / NULLIF(SUM(ca
                     <form method="post" class="row g-2">
                         <input type="hidden" name="csrf_token" value="<?php echo $_SESSION["csrf_token"]; ?>">
                         <input type="hidden" name="action" value="add_member">
-                        <div class="col-6"><input type="text" name="username" class="form-control form-control-sm" placeholder="Username" required></div>
-                        <div class="col-6"><input type="password" name="password" class="form-control form-control-sm" placeholder="Password" required></div>
-                        <div class="col-6"><input type="text" name="name" class="form-control form-control-sm" placeholder="Name" required></div>
-                        <div class="col-6"><input type="text" name="phone" class="form-control form-control-sm" placeholder="Phone"></div>
-                        <div class="col-12"><button type="submit" class="btn btn-sm btn-primary w-100">Add Member</button></div>
+                        <div class="col-6"><input type="text" name="username" class="form-control form-control-sm" placeholder="Tên đăng nhập" required></div>
+                        <div class="col-6"><input type="password" name="password" class="form-control form-control-sm" placeholder="Mật khẩu" required></div>
+                        <div class="col-6"><input type="text" name="name" class="form-control form-control-sm" placeholder="Họ và tên" required></div>
+                        <div class="col-6"><input type="text" name="phone" class="form-control form-control-sm" placeholder="Số điện thoại"></div>
+                        <div class="col-12"><button type="submit" class="btn btn-sm btn-primary w-100">Thêm Hội Viên Mới</button></div>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- Renew Package Section -->
+        <!-- Gia Hạn Gói & Thanh Toán Section -->
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-dark text-white"><h5 class="mb-0">Renew Package</h5></div>
+                <div class="card-header bg-dark text-white"><h5 class="mb-0">Gia Hạn Gói & Thanh Toán</h5></div>
                 <div class="card-body">
                     <form method="post">
                         <input type="hidden" name="csrf_token" value="<?php echo $_SESSION["csrf_token"]; ?>">
                         <input type="hidden" name="action" value="renew_package">
                         <div class="mb-3">
                             <select name="member_id" class="form-select form-select-sm" required>
-                                <option value="">Select Member</option>
+                                <option value="">-- Chọn Hội Viên --</option>
                                 <?php foreach ($members as $m): ?>
                                 <option value="<?php echo htmlspecialchars($m["id"]); ?>"><?php echo htmlspecialchars($m["name"]); ?></option>
                                 <?php endforeach; ?>
@@ -256,13 +256,13 @@ $fill_rate = $pdo->query("SELECT (SELECT COUNT(*) FROM bookings) / NULLIF(SUM(ca
                         </div>
                         <div class="mb-3">
                             <select name="package_id" class="form-select form-select-sm" required>
-                                <option value="">Select Package</option>
+                                <option value="">-- Chọn Gói Tập --</option>
                                 <?php foreach ($packages as $p): ?>
                                 <option value="<?php echo htmlspecialchars($p["id"]); ?>"><?php echo htmlspecialchars($p["name"]); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-sm btn-primary w-100">Renew Package</button>
+                        <button type="submit" class="btn btn-sm btn-primary w-100">Gia Hạn Gói & Thanh Toán</button>
                     </form>
                 </div>
             </div>
@@ -270,13 +270,13 @@ $fill_rate = $pdo->query("SELECT (SELECT COUNT(*) FROM bookings) / NULLIF(SUM(ca
     </div>
   </div>
 
-  <!-- Packages Tab -->
+  <!-- Danh Sách Gói Tập Tab -->
   <div class="tab-pane fade" id="packages" role="tabpanel" aria-labelledby="packages-tab">
     <div class="row">
-        <!-- Packages Section -->
+        <!-- Danh Sách Gói Tập Section -->
         <div class="col-md-12 mb-4">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-dark text-white"><h5 class="mb-0">Packages</h5></div>
+                <div class="card-header bg-dark text-white"><h5 class="mb-0">Danh Sách Gói Tập</h5></div>
                 <div class="card-body p-0">
                     <table class="table table-hover mb-0">
                         <tbody>
@@ -301,10 +301,10 @@ $fill_rate = $pdo->query("SELECT (SELECT COUNT(*) FROM bookings) / NULLIF(SUM(ca
                     <form method="post" class="row g-2">
                         <input type="hidden" name="csrf_token" value="<?php echo $_SESSION["csrf_token"]; ?>">
                         <input type="hidden" name="action" value="add_package">
-                        <div class="col-12"><input type="text" name="name" class="form-control form-control-sm" placeholder="Name" required></div>
+                        <div class="col-12"><input type="text" name="name" class="form-control form-control-sm" placeholder="Họ và tên" required></div>
                         <div class="col-6"><input type="number" name="duration_days" class="form-control form-control-sm" placeholder="Days" required></div>
                         <div class="col-6"><input type="number" step="0.01" name="price" class="form-control form-control-sm" placeholder="Price" required></div>
-                        <div class="col-12"><button type="submit" class="btn btn-sm btn-primary w-100">Add Package</button></div>
+                        <div class="col-12"><button type="submit" class="btn btn-sm btn-primary w-100">Thêm Gói Tập Mới</button></div>
                     </form>
                 </div>
             </div>
@@ -312,20 +312,20 @@ $fill_rate = $pdo->query("SELECT (SELECT COUNT(*) FROM bookings) / NULLIF(SUM(ca
     </div>
   </div>
 
-  <!-- Trainers Tab -->
+  <!-- Danh Sách Huấn Luyện Viên (PT) Tab -->
   <div class="tab-pane fade" id="trainers" role="tabpanel" aria-labelledby="trainers-tab">
     <div class="row">
-        <!-- Trainers Section -->
+        <!-- Danh Sách Huấn Luyện Viên (PT) Section -->
         <div class="col-md-12 mb-4">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-dark text-white"><h5 class="mb-0">Add Trainer</h5></div>
+                <div class="card-header bg-dark text-white"><h5 class="mb-0">Thêm Huấn Luyện Viên Mới</h5></div>
                 <div class="card-body">
                     <form method="post">
                         <input type="hidden" name="csrf_token" value="<?php echo $_SESSION["csrf_token"]; ?>">
                         <input type="hidden" name="action" value="add_trainer">
-                        <div class="mb-2"><input type="text" name="username" class="form-control form-control-sm" placeholder="Username" required></div>
-                        <div class="mb-2"><input type="password" name="password" class="form-control form-control-sm" placeholder="Password" required></div>
-                        <div class="mb-2"><input type="text" name="name" class="form-control form-control-sm" placeholder="Name" required></div>
+                        <div class="mb-2"><input type="text" name="username" class="form-control form-control-sm" placeholder="Tên đăng nhập" required></div>
+                        <div class="mb-2"><input type="password" name="password" class="form-control form-control-sm" placeholder="Mật khẩu" required></div>
+                        <div class="mb-2"><input type="text" name="name" class="form-control form-control-sm" placeholder="Họ và tên" required></div>
                         <div class="mb-2">
     <select name="gender" class="form-select form-select-sm">
         <option value="Nam">PT Nam</option>
@@ -342,7 +342,7 @@ $fill_rate = $pdo->query("SELECT (SELECT COUNT(*) FROM bookings) / NULLIF(SUM(ca
         <option value="Group X">Group X</option>
     </select>
 </div>
-                        <button type="submit" class="btn btn-sm btn-primary w-100">Add Trainer</button>
+                        <button type="submit" class="btn btn-sm btn-primary w-100">Thêm Huấn Luyện Viên Mới</button>
                     </form>
                 </div>
             </div>
@@ -350,20 +350,20 @@ $fill_rate = $pdo->query("SELECT (SELECT COUNT(*) FROM bookings) / NULLIF(SUM(ca
     </div>
   </div>
 
-  <!-- Schedules Tab -->
+  <!-- Lịch Trình Các Lớp Học Tab -->
   <div class="tab-pane fade" id="schedules" role="tabpanel" aria-labelledby="schedules-tab">
     <div class="row">
-        <!-- Schedules Section -->
+        <!-- Lịch Trình Các Lớp Học Section -->
         <div class="col-md-12 mb-4">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-dark text-white"><h5 class="mb-0">Add Schedule</h5></div>
+                <div class="card-header bg-dark text-white"><h5 class="mb-0">Xếp Lịch Lớp Mới</h5></div>
                 <div class="card-body">
                     <form method="post">
                         <input type="hidden" name="csrf_token" value="<?php echo $_SESSION["csrf_token"]; ?>">
                         <input type="hidden" name="action" value="add_schedule">
                         <div class="mb-2">
                             <select name="trainer_id" class="form-select form-select-sm" required>
-                                <option value="">Select Trainer</option>
+                                <option value="">-- Chọn Huấn Luyện Viên --</option>
                                 <?php foreach ($trainers as $t): ?>
                                 <option value="<?php echo $t["id"]; ?>"><?php echo htmlspecialchars($t["name"]); ?></option>
                                 <?php endforeach; ?>
@@ -388,8 +388,8 @@ $fill_rate = $pdo->query("SELECT (SELECT COUNT(*) FROM bookings) / NULLIF(SUM(ca
                             <label class="form-label mb-0 small">End</label>
                             <input type="datetime-local" name="end_time" class="form-control form-control-sm" required>
                         </div>
-                        <div class="mb-3"><input type="number" name="capacity" class="form-control form-control-sm" placeholder="Capacity" required></div>
-                        <button type="submit" class="btn btn-sm btn-primary w-100">Add Schedule</button>
+                        <div class="mb-3"><input type="number" name="capacity" class="form-control form-control-sm" placeholder="Sức chứa tối đa (người)" required></div>
+                        <button type="submit" class="btn btn-sm btn-primary w-100">Xếp Lịch Lớp Mới</button>
                     </form>
                 </div>
             </div>
