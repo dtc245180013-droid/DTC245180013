@@ -1,9 +1,9 @@
 <?php
 session_start();
-$host = getenv("DB_HOST") ?: "127.0.0.1";
-$db = getenv("DB_NAME") ?: "gym_db";
-$user = getenv("DB_USER") ?: "root";
-$pass = getenv("DB_PASS") ?: "";
+$host = getenv("DB_HOST") ?: "db";
+$db = getenv("MYSQL_DATABASE") ?: "gym";
+$user = getenv("MYSQL_USER") ?: "gym_app";
+$pass = getenv("MYSQL_PASSWORD") ?: "GymAppP@ssw0rd!2026";
 $charset = "utf8mb4";
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 $options = [
@@ -13,7 +13,7 @@ $options = [
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
-    // silently catch for now
+    die("Database connection failed: " . $e->getMessage());
 }
 
 if (empty($_SESSION["csrf_token"])) {

@@ -47,44 +47,125 @@ $my_bookings = $pdo->prepare("SELECT b.id, s.class_name, s.start_time, b.status 
 $my_bookings->execute([$member_id]);
 $my_bookings = $my_bookings->fetchAll();
 ?>
-<!DOCTYPE html>
-<html>
-<head><title>Member Dashboard</title></head>
-<body>
-    <h1>Member Dashboard - <?php echo htmlspecialchars($member["name"]); ?></h1>
-    <a href="index.php">Back</a>
-    <?php if (isset($_SESSION["error"])) { echo "<p style='color:red'>" . htmlspecialchars($_SESSION["error"]) . "</p>"; unset($_SESSION["error"]); } ?>
-    
-    <h2>My Bookings</h2>
-    <ul>
-        <?php foreach ($my_bookings as $b): ?>
-            <li>
-                <?php echo htmlspecialchars($b["class_name"]); ?> at <?php echo htmlspecialchars($b["start_time"]); ?> - <?php echo htmlspecialchars($b["status"]); ?>
-                <?php if ($b["status"] === "booked"): ?>
-                    <form method="post" style="display:inline;">
-                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION["csrf_token"]; ?>">
-                        <input type="hidden" name="action" value="cancel">
-                        <input type="hidden" name="booking_id" value="<?php echo htmlspecialchars($b["id"]); ?>">
-                        <button type="submit">Cancel</button>
-                    </form>
-                <?php endif; ?>
-            </li>
-        <?php endforeach; ?>
-    </ul>
+<?php require_once "header.php"; ?>
+<h2 class="mb-4"><i class="fas fa-calendar-alt text-info"></i> Member Dashboard - <?php echo htmlspecialchars($member["name"]); ?></h2>
 
-    <h2>Available Classes</h2>
-    <ul>
-        <?php foreach ($schedules as $s): ?>
-            <li>
-                <?php echo htmlspecialchars($s["class_name"]); ?> (<?php echo htmlspecialchars($s["start_time"]); ?>) - Capacity: <?php echo htmlspecialchars($s["capacity"]); ?>
-                <form method="post" style="display:inline;">
-                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION["csrf_token"]; ?>">
-                    <input type="hidden" name="action" value="book">
-                    <input type="hidden" name="schedule_id" value="<?php echo htmlspecialchars($s["id"]); ?>">
-                    <button type="submit">Book</button>
-                </form>
-            </li>
-        <?php endforeach; ?>
-    </ul>
-</body>
-</html>
+<?php if (isset($_SESSION["error"])): ?>
+    <div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($_SESSION["error"]); unset($_SESSION["error"]); ?></div>
+<?php endif; ?>
+
+<ul class="nav nav-tabs mb-4" id="memberTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings" type="button" role="tab" aria-controls="bookings" aria-selected="true">My Đặt lớpings</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="classes-tab" data-bs-toggle="tab" data-bs-target="#classes" type="button" role="tab" aria-controls="classes" aria-selected="false">Available Classes</button>
+  </li>
+</ul>
+
+<div class="tab-content" id="memberTabsContent">
+  <!-- My Đặt lớpings Tab -->
+  <div class="tab-pane fade show active" id="bookings" role="tabpanel" aria-labelledby="bookings-tab">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-list-ul"></i> My Đặt lớpings</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover table-bordered mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-3">Class</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($my_bookings as $b): ?>
+                            <tr>
+                                <td class="ps-3"><?php echo htmlspecialchars($b["class_name"]); ?></td>
+                                <td><?php echo htmlspecialchars(date('M d, H:i', strtotime($b["start_time"]))); ?></td>
+                                <td>
+                                    <?php if ($b["status"] === "booked"): ?>
+                                        <span class="badge bg-warning text-dark">Đặt lớped</span>
+                                    <?php elseif ($b["status"] === "attended"): ?>
+                                        <span class="badge bg-success">Attended</span>
+                                    <?php elseif ($b["status"] === "cancelled"): ?>
+                                        <span class="badge bg-danger">Cancelled</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary"><?php echo htmlspecialchars($b["status"]); ?></span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if ($b["status"] === "booked"): ?>
+                                        <form method="post" style="display:inline;">
+                                            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION["csrf_token"]; ?>">
+                                            <input type="hidden" name="action" value="cancel">
+                                            <input type="hidden" name="booking_id" value="<?php echo htmlspecialchars($b["id"]); ?>">
+                                            <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Cancel</button>
+                                        </form>
+                                    <?php else: ?>
+                                        <span class="text-muted">-</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                            <?php if (count($my_bookings) === 0): ?>
+                            <tr><td colspan="4" class="text-center text-muted py-3">No bookings yet.</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Available Classes Tab -->
+  <div class="tab-pane fade" id="classes" role="tabpanel" aria-labelledby="classes-tab">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-calendar-plus"></i> Available Classes</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover table-bordered mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-3">Class</th>
+                                <th>Time</th>
+                                <th>Capacity</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($schedules as $s): ?>
+                            <tr>
+                                <td class="ps-3"><?php echo htmlspecialchars($s["class_name"]); ?></td>
+                                <td><?php echo htmlspecialchars(date('M d, H:i', strtotime($s["start_time"]))); ?></td>
+                                <td><span class="badge bg-secondary"><?php echo htmlspecialchars($s["capacity"]); ?></span></td>
+                                <td>
+                                    <form method="post" style="display:inline;">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION["csrf_token"]; ?>">
+                                        <input type="hidden" name="action" value="book">
+                                        <input type="hidden" name="schedule_id" value="<?php echo htmlspecialchars($s["id"]); ?>">
+                                        <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-bookmark"></i> Đặt lớp</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                            <?php if (count($schedules) === 0): ?>
+                            <tr><td colspan="4" class="text-center text-muted py-3">No classes available.</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
+<?php require_once "footer.php"; ?>

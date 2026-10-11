@@ -6,21 +6,20 @@ if (!isset($_SESSION["user_id"])) {
 }
 $role = $_SESSION["role"];
 ?>
-<!DOCTYPE html>
-<html>
-<head><title>Dashboard</title></head>
-<body>
-    <h1>Welcome, <?php echo htmlspecialchars($_SESSION["username"]); ?> (<?php echo htmlspecialchars($role); ?>)</h1>
-    <a href="logout.php">Logout</a>
-    <hr>
-    <?php
-    if ($role === "manager") {
-        echo "<a href='manager.php'>Manager Dashboard</a>";
-    } elseif ($role === "trainer") {
-        echo "<a href='trainer.php'>Trainer Dashboard</a>";
-    } elseif ($role === "member") {
-        echo "<a href='member.php'>Member Dashboard</a>";
-    }
-    ?>
-</body>
-</html>
+<?php require_once "header.php"; ?>
+<div class="row mt-4">
+    <div class="col-md-12 text-center">
+        <h1 class="display-4"><i class="fas fa-user-circle"></i> Welcome, <?php echo htmlspecialchars($_SESSION["username"]); ?></h1>
+        <p class="lead mt-3">You are logged in as a <strong><span class="badge bg-secondary"><?php echo htmlspecialchars($role); ?></span></strong>.</p>
+        <hr class="my-4">
+        
+        <?php if ($role === "manager"): ?>
+            <a href='manager.php' class='btn btn-primary btn-lg m-2'><i class="fas fa-chart-line"></i> Go to Manager Dashboard</a>
+        <?php elseif ($role === "trainer"): ?>
+            <a href='trainer.php' class='btn btn-success btn-lg m-2'><i class="fas fa-stopwatch"></i> Go to Trainer Dashboard</a>
+        <?php elseif ($role === "member"): ?>
+            <a href='member.php' class='btn btn-info btn-lg m-2 text-white'><i class="fas fa-calendar-alt"></i> Go to Member Dashboard</a>
+        <?php endif; ?>
+    </div>
+</div>
+<?php require_once "footer.php"; ?>

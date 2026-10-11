@@ -1,0 +1,203 @@
+/* --- Google Fonts: Inter & Plus Jakarta Sans --- */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --primary-color: #2563EB;
+    --primary-hover: #1D4ED8;
+    --primary-light: #EFF6FF;
+    --dark-surface: #0F172A;
+    --bg-main: #F8FAFC;
+    --card-border: #E2E8F0;
+    --text-main: #1E293B;
+    --text-muted: #64748B;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+    background-color: var(--bg-main) !important;
+    color: var(--text-main) !important;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* --- Top Modern Navbar --- */
+.navbar {
+    background-color: var(--dark-surface) !important;
+    padding: 0.85rem 1.5rem !important;
+    border-bottom: 1px solid #1E293B !important;
+}
+
+.navbar-brand {
+    font-weight: 800 !important;
+    font-size: 1.25rem !important;
+    letter-spacing: -0.02em;
+    color: #F8FAFC !important;
+}
+
+.navbar-brand i {
+    color: #38BDF8 !important;
+}
+
+.navbar .nav-link {
+    font-weight: 600 !important;
+    font-size: 0.925rem !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: var(--radius-sm) !important;
+    color: #94A3B8 !important;
+    transition: all 0.2s ease;
+}
+
+.navbar .nav-link:hover, .navbar .nav-link.active {
+    color: #FFFFFF !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.badge {
+    font-weight: 700 !important;
+    padding: 0.4rem 0.75rem !important;
+    border-radius: 6px !important;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* --- Modern Card Containers (Bo góc vuông vắn tinh tế) --- */
+.card {
+    border: 1px solid var(--card-border) !important;
+    border-radius: var(--radius-md) !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02) !important;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04) !important;
+}
+
+.card-header {
+    background-color: #FFFFFF !important;
+    border-bottom: 1px solid var(--card-border) !important;
+    font-weight: 700 !important;
+    padding: 1rem 1.25rem !important;
+    color: var(--text-main) !important;
+}
+
+.card-header.bg-dark {
+    background-color: var(--dark-surface) !important;
+    color: #FFFFFF !important;
+}
+
+/* --- Modern Form Inputs & Selects --- */
+.form-control, .form-select {
+    font-family: inherit !important;
+    font-size: 0.925rem !important;
+    border: 1.5px solid var(--card-border) !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 0.65rem 0.85rem !important;
+    background-color: #F8FAFC !important;
+    color: var(--text-main) !important;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #FFFFFF !important;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+    outline: none !important;
+}
+
+/* --- Modern Buttons --- */
+.btn {
+    font-weight: 600 !important;
+    font-size: 0.925rem !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 0.6rem 1.25rem !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 1px 2px 0 rgba(37, 99, 235, 0.2) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover) !important;
+    border-color: var(--primary-hover) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3) !important;
+}
+
+.btn-outline-light:hover {
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    border-radius: var(--radius-sm) !important;
+}
+
+/* --- Clean Tables --- */
+.table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    font-size: 0.925rem !important;
+}
+
+.table thead th {
+    background-color: #F8FAFC !important;
+    color: var(--text-muted) !important;
+    font-weight: 700 !important;
+    font-size: 0.8rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1.5px solid var(--card-border) !important;
+    padding: 0.85rem 1rem !important;
+}
+
+.table tbody td {
+    padding: 0.95rem 1rem !important;
+    vertical-align: middle !important;
+    border-bottom: 1px solid var(--card-border) !important;
+}
+
+.table-hover tbody tr:hover td {
+    background-color: #F1F5F9 !important;
+}
+
+/* --- Modern Tab Navigation --- */
+.nav-tabs {
+    border-bottom: 2px solid var(--card-border) !important;
+    gap: 0.5rem;
+}
+
+.nav-tabs .nav-link {
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    color: var(--text-muted) !important;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    border-radius: 0 !important;
+    padding: 0.75rem 1.25rem !important;
+    margin-bottom: -2px !important;
+    transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--primary-color) !important;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary-color) !important;
+    border-bottom: 2.5px solid var(--primary-color) !important;
+    background: transparent !important;
+}
+
+/* --- Stat Summary Cards --- */
+.display-6, .h3, h3 {
+    font-weight: 800 !important;
+    letter-spacing: -0.02em;
+}
+
