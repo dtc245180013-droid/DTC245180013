@@ -1,59 +1,169 @@
-# Hệ Thống Quản Lý Phòng Gym / Fitness
+# Hệ Thống Quản Lý Phòng Gym & Thể Thao (Gym & Fitness Management System)
+### Đồ án DevOps & An Toàn Hệ Thống Phân Tán (Đề 23)
 
-Hệ thống quản lý phòng tập Gym toàn diện triển khai với kiến trúc microservices trên nền tảng Docker & Docker Compose.
+Hệ thống quản lý phòng Gym và thể thao toàn diện được xây dựng trên kiến trúc Multi-Container Docker Compose với đầy đủ các tiêu chuẩn bảo mật, giám sát hiệu năng, thu thập log tập trung và cảnh báo sự cố tự động.
 
-## 1. Cấu Trúc Thư Mục
+---
+
+## 1. Kiến Trúc Hệ Thống (Architecture)
+
+```mermaid
+graph TD
+    User([Hội viên / HLV / Quản lý]) -->|HTTPS :443| Nginx[Nginx Reverse Proxy & SSL]
+    Nginx -->|Proxy :80| Web[Web App - PHP 8.2 Apache]
+    Nginx -->|Proxy :80| PMA[phpMyAdmin /phpmyadmin/]
+    Nginx -->|Proxy :3000| Grafana[Grafana /grafana/]
+
+    subgraph Frontend Network
+        Nginx
+        Web
+        PMA
+        Grafana
+    end
+
+    subgraph Backend Network [Backend - Internal Only]
+        Web
+        PMA
+        DB[(MySQL 8.0 Database)]
+        MySQLExporter[mysqld-exporter]
+    end
+
+    subgraph Monitoring Network
+        NginxExporter[nginx-exporter]
+        MySQLExporter
+        cAdvisor[cAdvisor]
+        Prometheus[Prometheus :9090]
+        Loki[Grafana Loki :3100]
+        Promtail[Promtail Agent]
+        AlertSink[Alert Sink Webhook :8080]
+        Grafana
+    end
+
+    Prometheus -->|Scrape Metrics| NginxExporter
+    Prometheus -->|Scrape Metrics| MySQLExporter
+    Prometheus -->|Scrape Metrics| cAdvisor
+    Promtail -->|Scrape Container Logs| Web
+    Promtail -->|Scrape Logs| Nginx
+    Promtail -->|Push Logs| Loki
+    Grafana -->|Query Metrics| Prometheus
+    Grafana -->|Query Logs & Alerting| Loki
+    Grafana -->|Webhook Alert FIRING| AlertSink
 ```
-gym/
-├── db/
-│   └── init.sql              # Khởi tạo CSDL, 7 bảng, index, seed dữ liệu mẫu
-├── nginx/
-│   ├── nginx.conf            # Reverse Proxy, SSL TLS 1.2/1.3, Security Headers
-│   ├── gen-cert.sh           # Script tự sinh chứng chỉ SSL tự ký
-│   └── certs/
-│       ├── server.crt        # Chứng chỉ công khai (SAN IP & localhost)
-│       └── server.key        # Khóa riêng tư (bảo mật, không commit)
-├── web/
-│   ├── Dockerfile            # PHP 8.2 Apache + PDO MySQL
-│   └── src/                  # Mã nguồn ứng dụng Web PHP thuần
-├── evidence/                 # Bằng chứng kiểm thử các bước
-├── docker-compose.yml        # Định nghĩa các dịch vụ Docker
-├── .env                      # Biến môi trường bảo mật
-└── .env.example              # Mẫu biến môi trường
-```
 
-## 2. Hướng Dẫn Tự Sinh Chứng Chỉ SSL Tự Ký
-Hệ thống sử dụng script tự động để tạo chứng chỉ SSL X.509 với thời hạn 365 ngày và Subject Alternative Name (SAN):
+---
+
+## 2. Công Nghệ Sử Dụng (Tech Stack)
+
+| Phân hệ | Công nghệ & Phiên bản | Chức năng chính |
+| :--- | :--- | :--- |
+| **Reverse Proxy** | `nginx:1.27-alpine` | Reverse proxy HTTPS (TLS 1.2/1.3), tự động chuyển hướng HTTP 301, chặn 7 cổng nhạy cảm, áp dụng 7 Security Headers |
+| **Web Application** | `php:8.2-apache` | Ứng dụng quản trị phòng gym thuần PHP PDO, CSRF token, XSS sanitize, phân quyền 3 vai trò, biên lai thanh toán, Bootstrap 5 UI |
+| **Database** | `mysql:8.0` | CSDL quan hệ 7 bảng (users, members, packages, trainers, memberships, schedules, bookings), InnoDB, bcrypt hashing |
+| **DB Admin** | `phpmyadmin:5.2.1` | Giao diện quản trị CSDL qua reverse proxy tại `/phpmyadmin/` |
+| **Giám sát Metrics** | `prom/prometheus:v2.53.0` | Thu thập metrics định kỳ từ các exporter |
+| **Hiển thị Dashboard** | `grafana/grafana:11.1.0` | Trực quan hóa dữ liệu với 4 dashboards tự động nạp (provisioned) |
+| **Container Metrics** | `cadvisor:v0.49.1` | Giám sát CPU, RAM, Network, I/O của toàn bộ 12 containers |
+| **Nginx Metrics** | `nginx-prometheus-exporter:1.1.0` | Thu thập active connections, request rate qua `stub_status` |
+| **MySQL Metrics** | `prom/mysqld-exporter:v0.15.1` | Thu thập query throughput, connection pool, buffer pool |
+| **Thu thập Log** | `grafana/loki:3.1.0` | Cơ sở dữ liệu log tập trung (LogQL) |
+| **Log Shipper** | `grafana/promtail:3.1.0` | Quét log Docker container và gán nhãn tự động (`webapp`, `nginx`, `mysql`) |
+| **Bộ thu Cảnh báo** | Custom Python HTTP Server | Endpoint tiếp nhận webhook JSON từ Grafana Alertmanager |
+
+---
+
+## 3. Danh Sách Tài Khoản & Mật Khẩu (Credentials)
+
+### 3.1. Tài khoản Đăng nhập Ứng dụng Gym (`https://<IP>/login.php`)
+| Vai trò | Tên đăng nhập | Mật khẩu mặc định | Quyền hạn |
+| :--- | :--- | :--- | :--- |
+| **Quản lý (Manager)** | `admin` | `Gym@2026!` | CRUD Hội viên, Gói tập, HLV, Lịch tập, Gia hạn gói, Xuất biên lai, Báo cáo doanh thu |
+| **Huấn luyện viên** | `hlv01` .. `hlv05` | `Gym@2026!` | Xem ca dạy của mình, xem danh sách học viên đăng ký, điểm danh hội viên |
+| **Hội viên (Member)** | `hoivien01` .. `hoivien15` | `Gym@2026!` | Xem hồ sơ gói tập, đặt chỗ lớp tập (SELECT FOR UPDATE chống overbooking), hủy đặt chỗ |
+
+### 3.2. Dịch vụ Hạ tầng & Giám sát
+- **Grafana URL:** `https://<IP>/grafana/` (hoặc `http://localhost:3000`)
+  - Tài khoản: `admin` / Mật khẩu: `GymGrafanaP@ss2026!`
+- **phpMyAdmin URL:** `https://<IP>/phpmyadmin/`
+  - Tài khoản: `gym_app` / Mật khẩu: `GymAppP@ss2026!` (hoặc root: `GymRootP@ssw0rd!2026`)
+- **MySQL Root:** `root` / `GymRootP@ssw0rd!2026`
+- **SSH Quản trị VM:** `huyenxinh@192.168.233.128` (Cổng SSH: **2849**)
+
+---
+
+## 4. Hướng Dẫn Cài Đặt & Vận Hành (Quick Start)
+
+### 4.1. Khởi tạo môi trường
 ```bash
-# Chạy script tự sinh chứng chỉ:
+# 1. Clone repository
+git clone https://github.com/dtc245180013-droid/DTC245180013.git ~/gym
+cd ~/gym
+
+# 2. Tạo chứng chỉ SSL tự ký
 chmod +x nginx/gen-cert.sh
 ./nginx/gen-cert.sh
-```
-Khóa riêng tư `server.key` được cấu hình bảo mật với quyền `chmod 600` và được khai báo bỏ qua trong `.gitignore`.
 
-## 3. Khởi Chạy Hệ Thống
-```bash
-# Sao chép và cấu hình biến môi trường:
+# 3. Tạo file cấu hình môi trường .env (nếu chưa có)
 cp .env.example .env
 
-# Khởi chạy toàn bộ hệ thống bằng Docker Compose:
+# 4. Khởi chạy toàn bộ hệ thống
 docker compose up -d --build
 ```
 
-## 4. Truy Cập Hệ Thống
-- **Ứng dụng Web:** `https://192.168.233.128/` (hoặc `http://192.168.233.128/` - tự động chuyển hướng 301 sang HTTPS)
-- **Quản trị CSDL (phpMyAdmin):** `https://192.168.233.128/phpmyadmin/`
+### 4.2. Kiểm tra trạng thái
+```bash
+# Kiểm tra danh sách 12 container
+docker compose ps
 
-## 5. Giám Sát Hệ Thống (Prometheus & Grafana - Bước 4)
-- **Grafana URL:** `https://192.168.233.128/grafana/`
-- **Tài khoản Grafana:** `admin` / `GymGrafanaP@ss2026!`
-- **Prometheus Targets:** `cadvisor`, `nginx-exporter`, `mysqld-exporter`, `prometheus` (tất cả đều trạng thái `UP`).
-- **Dashboards tự động nạp:**
-  - `GYM - Containers`: Giám sát CPU %, RAM, Network I/O của toàn bộ container Docker.
-  - `GYM - Nginx`: Giám sát kết nối active, lưu lượng requests/giây, trạng thái kết nối.
-  - `GYM - MySQL`: Giám sát truy vấn/giây, số kết nối hiện tại, threads running, dung lượng InnoDB Buffer Pool.
-- **Xem Prometheus nội bộ (SSH Tunnel an toàn):**
-  ```bash
-  ssh -p 2849 -L 9090:localhost:9090 huyenxinh@192.168.233.128
-  # Mở trình duyệt máy thật truy cập: http://localhost:9090/targets
+# Kiểm tra sức khỏe ứng dụng
+curl -sk https://localhost/health.php
+```
+
+---
+
+## 5. Giám Sát & Truy Vấn Nhật Ký (Monitoring & LogQL)
+
+### 5.1. Các Dashboard Grafana đã nạp sẵn
+1. **GYM - Containers:** Giám sát CPU/RAM thực tế của từng container (cAdvisor).
+2. **GYM - Nginx:** Giám sát lưu lượng HTTP request, active connections, status codes.
+3. **GYM - MySQL:** Giám sát số lượng truy vấn, kết nối hiện thời, bộ nhớ đệm InnoDB.
+4. **GYM - Logs:** Truy vấn trực quan log của Webapp và Nginx qua Grafana Loki.
+
+### 5.2. Các truy vấn LogQL mẫu (Thực hiện trong Grafana Explore hoặc Loki API)
+- **Truy vấn lỗi 5xx trên Nginx:**
+  ```logql
+  {job="nginx"} |~ " (500|502|503|504) "
   ```
+- **Truy vấn ngoại lệ / lỗi trên Web Application:**
+  ```logql
+  {job="webapp"} |~ "(?i)(error|exception|failed)"
+  ```
+- **Truy vấn hành vi đăng nhập sai (Brute-Force Detection):**
+  ```logql
+  {job="webapp"} |= "LOGIN_FAILED"
+  ```
+- **Đo lường tần suất đăng nhập sai trong 5 phút (Metric LogQL):**
+  ```logql
+  sum(count_over_time({job="webapp"} |= "LOGIN_FAILED" [5m]))
+  ```
+
+---
+
+## 6. Kịch Bản Giả Lập Tấn Công & Cảnh Báo (Incident Scenario)
+
+```bash
+# Chạy script giả lập 20 lượt đăng nhập sai liên tiếp vào tài khoản admin:
+bash scripts/simulate_bruteforce.sh
+
+# Kiểm tra webhook cảnh báo được gửi tới Alert Sink:
+docker logs gym_alert_sink
+```
+Alert Rule `GYM - Brute force login` trong Grafana sẽ tự động chuyển trạng thái `FIRING` khi tần suất đăng nhập sai vượt quá 5 lần/phút, và bắn webhook JSON HTTP POST về `http://alert-sink:8080/`.
+
+---
+
+## 7. Các Biện Pháp Gia Cố Bảo Mật (Security Hardening)
+1. **Phân vùng mạng 3 lớp (Network Segmentation):** Tách biệt `frontend`, `backend` (`internal: true`), và `monitoring`. Database `gym_db` hoàn toàn không bị Nginx hay bên ngoài kết nối trực tiếp.
+2. **Đặc quyền tối thiểu CSDL (Least Privilege):** Tài khoản `gym_app` chỉ có quyền `SELECT, INSERT, UPDATE, DELETE` trên CSDL `gym.*`. Thu hồi toàn bộ quyền `DROP, ALTER, CREATE`.
+3. **Hạn chế đặc quyền & Tài nguyên Container:** Bật `no-new-privileges:true`, giới hạn cứng CPU và RAM cho từng container. Web service chạy với người dùng `www-data`.
+4. **Che giấu thông tin phiên bản (Information Disclosure Mitigation):** Tắt `expose_php`, ẩn `ServerTokens Prod`, `ServerSignature Off`, `server_tokens off;`.
+5. **Tường lửa máy chủ (UFW):** Chỉ mở cổng 80, 443 và cổng SSH tùy biến 2849. Các cổng dịch vụ phụ (3306, 9090, 3000, 3100, 8080, 8081) đóng hoàn toàn.
