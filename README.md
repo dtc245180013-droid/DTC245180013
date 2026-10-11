@@ -67,7 +67,73 @@ graph TD
 
 ---
 
-## 3. Công Nghệ Sử Dụng (Tech Stack)
+## 3. Cấu Trúc Thư Mục Hệ Thống (Directory Structure)
+
+```text
+gym/
+├── .env.example                     # File mẫu khai báo các biến môi trường và mật khẩu
+├── .gitignore                       # Danh sách các tệp tin loại trừ khỏi Git (file .env, SSL key)
+├── docker-compose.yml               # Cấu hình khởi chạy tập trung 12 dịch vụ multi-container
+├── README.md                        # Tài liệu hướng dẫn kiến trúc và vận hành hệ thống
+├── alert-sink/                      # Phân hệ Webhook tiếp nhận cảnh báo sự cố an ninh
+│   ├── Dockerfile                   # Dockerfile xây dựng container Python Alert-Sink
+│   └── server.py                    # Server HTTP ghi nhận payload cảnh báo từ Grafana
+├── db/                              # Cơ sở dữ liệu MySQL
+│   └── init.sql                     # Script khởi tạo 7 bảng quan hệ và nạp dữ liệu mẫu tiếng Việt
+├── docs/                            # Tài liệu báo cáo và phân tích sự cố
+│   ├── cho-bao-cao.md               # Hướng dẫn chi tiết 17 ảnh chụp minh chứng & văn phong báo cáo
+│   └── su-co-bruteforce.md          # Báo cáo điều tra sự cố tấn công Brute-force (Incident Post-Mortem)
+├── evidence/                        # Thư mục lưu trữ 7 tệp minh chứng thực thi từng bước
+│   ├── buoc0-moitruong.txt          # Minh chứng khảo sát phần cứng VM, Docker và Git ban đầu
+│   ├── buoc12-web-db.txt            # Minh chứng CSDL 7 bảng, tài khoản và kiểm tra Web/DB
+│   ├── buoc3-nginx.txt              # Minh chứng cấu hình Nginx SSL, 301 redirect và Security Headers
+│   ├── buoc4-giamsat.txt            # Minh chứng 4 Prometheus targets UP và Grafana dashboards
+│   ├── buoc5-logql.txt              # Minh chứng kết quả thực tế 4 câu truy vấn LogQL qua Loki API
+│   ├── buoc5-sucodo.txt             # Minh chứng cảnh báo Firing và Webhook JSON nhận được
+│   └── buoc6-hardening.txt          # Minh chứng gia cố bảo mật mạng 3 lớp, quyền CSDL, UFW Firewall
+├── exporter/                        # Cấu hình kết nối cho các Exporter
+│   └── .my.cnf                      # Thông tin xác thực riêng biệt cho mysqld-exporter
+├── grafana/                         # Cấu hình tự động nạp dữ liệu cho Grafana (Provisioning)
+│   └── provisioning/
+│       ├── alerting/                # Quy tắc cảnh báo (Alert Rules) và Contact Points webhook
+│       │   └── alerting.yaml
+│       ├── dashboards/              # 4 Dashboard mẫu tự động nạp (Containers, Nginx, MySQL, Logs)
+│       └── datasources/             # Tự động kết nối Prometheus và Loki datasources
+│           ├── datasource.yml
+│           └── loki.yaml
+├── loki/                            # Cấu hình hệ thống thu thập log Grafana Loki
+│   └── loki-config.yaml
+├── nginx/                           # Cấu hình Nginx Reverse Proxy
+│   ├── certs/                       # Chứng chỉ số SSL X.509 tự ký (server.crt, server.key)
+│   ├── gen-cert.sh                  # Script OpenSSL tự động tạo chứng chỉ SSL có SAN IP
+│   └── nginx.conf                   # Cấu hình Reverse Proxy, TLS 1.2/1.3, đóng cổng phụ và Security Headers
+├── prometheus/                      # Cấu hình hệ thống thu thập số liệu Prometheus
+│   └── prometheus.yml               # Cấu hình các Job giám sát (cadvisor, nginx, mysql, prometheus)
+├── promtail/                        # Cấu hình Promtail Log Shipper
+│   └── promtail-config.yaml         # Cấu hình quét Docker container socket và gán nhãn tự động
+├── scripts/                         # Các script hỗ trợ vận hành và kiểm thử tự động
+│   ├── gen_logql_evidence.py        # Script chạy và trích xuất kết quả 4 truy vấn LogQL
+│   ├── harden_db.sql                # Script giới hạn đặc quyền tối thiểu cho CSDL MySQL
+│   ├── simulate_bruteforce.sh       # Kịch bản giả lập tấn công Brute-force tự động
+│   └── test_logql.py                # Script kiểm tra kết nối API Loki
+└── web/                             # Mã nguồn ứng dụng Quản lý Phòng Gym (PHP 8.2 Apache)
+    ├── Dockerfile                   # Dockerfile ứng dụng web với cấu hình ẩn version banner
+    └── src/                         # Mã nguồn PHP thuần chuẩn PDO, phân quyền 3 vai trò
+        ├── config.php               # Kết nối CSDL bảo mật và khởi tạo phiên làm việc CSRF
+        ├── header.php               # Thanh điều hướng Navbar Bootstrap 5 chuẩn giao diện tiếng Việt
+        ├── footer.php               # Chân trang bản quyền và thư viện JavaScript
+        ├── login.php                # Form đăng nhập bảo mật và ghi nhận log LOGIN_FAILED ra stderr
+        ├── logout.php               # Đăng xuất và hủy phiên làm việc an toàn
+        ├── manager.php              # Bảng điều khiển Quản lý (CRUD, Báo cáo, Gia hạn, Xuất biên lai)
+        ├── trainer.php              # Bảng điều khiển Huấn luyện viên (Lịch dạy, Điểm danh học viên)
+        ├── member.php               # Bảng điều khiển Hội viên (Gói tập, Đặt/hủy chỗ SELECT FOR UPDATE)
+        ├── health.php               # Endpoint kiểm tra sức khỏe hệ thống (Health Check)
+        └── custom.css               # Tùy biến phong cách giao diện bo góc hiện đại
+```
+
+---
+
+## 4. Công Nghệ Sử Dụng (Tech Stack)
 
 | Phân hệ | Công nghệ & Phiên bản | Chức năng chính |
 | :--- | :--- | :--- |
@@ -86,16 +152,16 @@ graph TD
 
 ---
 
-## 4. Danh Sách Tài Khoản & Mật Khẩu (Credentials)
+## 5. Danh Sách Tài Khoản & Mật Khẩu (Credentials)
 
-### 4.1. Tài khoản Đăng nhập Ứng dụng Gym (`https://<IP>/login.php`)
+### 5.1. Tài khoản Đăng nhập Ứng dụng Gym (`https://<IP>/login.php`)
 | Vai trò | Tên đăng nhập | Mật khẩu mặc định | Quyền hạn |
 | :--- | :--- | :--- | :--- |
 | **Quản lý (Manager)** | `admin` | `Gym@2026!` | CRUD Hội viên, Gói tập, HLV, Lịch tập, Gia hạn gói, Xuất biên lai, Báo cáo doanh thu |
 | **Huấn luyện viên** | `hlv01` .. `hlv05` | `Gym@2026!` | Xem ca dạy của mình, xem danh sách học viên đăng ký, điểm danh hội viên |
 | **Hội viên (Member)** | `hoivien01` .. `hoivien15` | `Gym@2026!` | Xem hồ sơ gói tập, đặt chỗ lớp tập (SELECT FOR UPDATE chống overbooking), hủy đặt chỗ |
 
-### 4.2. Dịch vụ Hạ tầng & Giám sát
+### 5.2. Dịch vụ Hạ tầng & Giám sát
 - **Grafana URL:** `https://<IP>/grafana/` (hoặc `http://localhost:3000`)
   - Tài khoản: `admin` / Mật khẩu: `GymGrafanaP@ss2026!`
 - **phpMyAdmin URL:** `https://<IP>/phpmyadmin/`
@@ -105,9 +171,9 @@ graph TD
 
 ---
 
-## 5. Hướng Dẫn Cài Đặt & Vận Hành (Quick Start)
+## 6. Hướng Dẫn Cài Đặt & Vận Hành (Quick Start)
 
-### 5.1. Khởi tạo môi trường
+### 6.1. Khởi tạo môi trường
 ```bash
 # 1. Clone repository
 git clone https://github.com/dtc245180013-droid/DTC245180013.git ~/gym
@@ -124,7 +190,7 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-### 5.2. Kiểm tra trạng thái
+### 6.2. Kiểm tra trạng thái
 ```bash
 # Kiểm tra danh sách 12 container
 docker compose ps
@@ -135,15 +201,15 @@ curl -sk https://localhost/health.php
 
 ---
 
-## 6. Giám Sát & Truy Vấn Nhật Ký (Monitoring & LogQL)
+## 7. Giám Sát & Truy Vấn Nhật Ký (Monitoring & LogQL)
 
-### 6.1. Các Dashboard Grafana đã nạp sẵn
+### 7.1. Các Dashboard Grafana đã nạp sẵn
 1. **GYM - Containers:** Giám sát CPU/RAM thực tế của từng container (cAdvisor).
 2. **GYM - Nginx:** Giám sát lưu lượng HTTP request, active connections, status codes.
 3. **GYM - MySQL:** Giám sát số lượng truy vấn, kết nối hiện thời, bộ nhớ đệm InnoDB.
 4. **GYM - Logs:** Truy vấn trực quan log của Webapp và Nginx qua Grafana Loki.
 
-### 6.2. Các truy vấn LogQL mẫu (Thực hiện trong Grafana Explore hoặc Loki API)
+### 7.2. Các truy vấn LogQL mẫu (Thực hiện trong Grafana Explore hoặc Loki API)
 - **Truy vấn lỗi 5xx trên Nginx:**
   ```logql
   {job="nginx"} |~ " (500|502|503|504) "
@@ -163,7 +229,7 @@ curl -sk https://localhost/health.php
 
 ---
 
-## 7. Kịch Bản Giả Lập Tấn Công & Cảnh Báo (Incident Scenario)
+## 8. Kịch Bản Giả Lập Tấn Công & Cảnh Báo (Incident Scenario)
 
 ```bash
 # Chạy script giả lập 20 lượt đăng nhập sai liên tiếp vào tài khoản admin:
@@ -176,7 +242,7 @@ Alert Rule `GYM - Brute force login` trong Grafana sẽ tự động chuyển tr
 
 ---
 
-## 8. Các Biện Pháp Gia Cố Bảo Mật (Security Hardening)
+## 9. Các Biện Pháp Gia Cố Bảo Mật (Security Hardening)
 1. **Phân vùng mạng 3 lớp (Network Segmentation):** Tách biệt `frontend`, `backend` (`internal: true`), và `monitoring`. Database `gym_db` hoàn toàn không bị Nginx hay bên ngoài kết nối trực tiếp.
 2. **Đặc quyền tối thiểu CSDL (Least Privilege):** Tài khoản `gym_app` chỉ có quyền `SELECT, INSERT, UPDATE, DELETE` trên CSDL `gym.*`. Thu hồi toàn bộ quyền `DROP, ALTER, CREATE`.
 3. **Hạn chế đặc quyền & Tài nguyên Container:** Bật `no-new-privileges:true`, giới hạn cứng CPU và RAM cho từng container. Web service chạy với người dùng `www-data`.
