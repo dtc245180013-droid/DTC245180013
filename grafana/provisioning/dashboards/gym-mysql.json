@@ -1,0 +1,117 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "title": "Questions / Queries per Second",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "rate(mysql_global_status_questions[1m])",
+          "legendFormat": "Queries/sec",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Current Connected Clients",
+      "type": "stat",
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "mysql_global_status_threads_connected",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Threads Running",
+      "type": "stat",
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "mysql_global_status_threads_running",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "InnoDB Buffer Pool Size & Usage",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "targets": [
+        {
+          "expr": "mysql_global_status_innodb_buffer_pool_bytes_data",
+          "legendFormat": "Data Bytes",
+          "refId": "A"
+        },
+        {
+          "expr": "mysql_global_variables_innodb_buffer_pool_size",
+          "legendFormat": "Total Buffer Pool Size",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "title": "MySQL Connections Total Rate",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "targets": [
+        {
+          "expr": "rate(mysql_global_status_connections[1m])",
+          "legendFormat": "Connections/sec",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": [
+    "gym",
+    "mysql"
+  ],
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "GYM - MySQL",
+  "uid": "gym-mysql",
+  "version": 1
+}

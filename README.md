@@ -43,3 +43,17 @@ docker compose up -d --build
 ## 4. Truy Cập Hệ Thống
 - **Ứng dụng Web:** `https://192.168.233.128/` (hoặc `http://192.168.233.128/` - tự động chuyển hướng 301 sang HTTPS)
 - **Quản trị CSDL (phpMyAdmin):** `https://192.168.233.128/phpmyadmin/`
+
+## 5. Giám Sát Hệ Thống (Prometheus & Grafana - Bước 4)
+- **Grafana URL:** `https://192.168.233.128/grafana/`
+- **Tài khoản Grafana:** `admin` / `GymGrafanaP@ss2026!`
+- **Prometheus Targets:** `cadvisor`, `nginx-exporter`, `mysqld-exporter`, `prometheus` (tất cả đều trạng thái `UP`).
+- **Dashboards tự động nạp:**
+  - `GYM - Containers`: Giám sát CPU %, RAM, Network I/O của toàn bộ container Docker.
+  - `GYM - Nginx`: Giám sát kết nối active, lưu lượng requests/giây, trạng thái kết nối.
+  - `GYM - MySQL`: Giám sát truy vấn/giây, số kết nối hiện tại, threads running, dung lượng InnoDB Buffer Pool.
+- **Xem Prometheus nội bộ (SSH Tunnel an toàn):**
+  ```bash
+  ssh -p 2849 -L 9090:localhost:9090 huyenxinh@192.168.233.128
+  # Mở trình duyệt máy thật truy cập: http://localhost:9090/targets
+  ```

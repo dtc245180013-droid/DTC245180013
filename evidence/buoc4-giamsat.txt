@@ -1,0 +1,37 @@
+=== 1. docker compose ps ===
+NAME                  IMAGE                                   COMMAND                  SERVICE           CREATED              STATUS                   PORTS
+gym_cadvisor          gcr.io/cadvisor/cadvisor:v0.49.1        "/usr/bin/cadvisor -…"   cadvisor          2 minutes ago        Up 2 minutes (healthy)   8080/tcp
+gym_db                mysql:8.0                               "docker-entrypoint.s…"   db                7 minutes ago        Up 7 minutes (healthy)   3306/tcp, 33060/tcp
+gym_grafana           grafana/grafana:11.1.0                  "/run.sh"                grafana           2 minutes ago        Up 2 minutes             3000/tcp
+gym_mysqld_exporter   prom/mysqld-exporter:v0.15.1            "/bin/mysqld_exporte…"   mysqld-exporter   About a minute ago   Up About a minute        9104/tcp
+gym_nginx             nginx:1.27-alpine                       "/docker-entrypoint.…"   nginx             7 minutes ago        Up About a minute        0.0.0.0:80->80/tcp, [::]:80->80/tcp, 0.0.0.0:443->443/tcp, [::]:443->443/tcp
+gym_nginx_exporter    nginx/nginx-prometheus-exporter:1.1.0   "/usr/bin/nginx-prom…"   nginx-exporter    2 minutes ago        Up 2 minutes             
+gym_pma               phpmyadmin:5.2.1                        "/docker-entrypoint.…"   phpmyadmin        7 minutes ago        Up 6 minutes             80/tcp
+gym_prometheus        prom/prometheus:v2.53.0                 "/bin/prometheus --c…"   prometheus        2 minutes ago        Up 2 minutes             9090/tcp
+gym_web               gym-web:latest                          "docker-php-entrypoi…"   web               2 minutes ago        Up 2 minutes             80/tcp
+
+=== 2. Prometheus Targets API Status ===
+Job: cadvisor     Target: cadvisor:8080            Health: up
+Job: mysql        Target: mysqld-exporter:9104     Health: up
+Job: nginx        Target: nginx-exporter:9113      Health: up
+Job: prometheus   Target: localhost:9090           Health: up
+
+=== 3. PromQL Queries Verification ===
+Query: container_memory_usage_bytes{name=~"gym_.*"}
+Query: nginx_connections_active
+  {'__name__': 'nginx_connections_active', 'instance': 'nginx-exporter:9113', 'job': 'nginx'}: [1791697125.021, '2']
+Query: mysql_global_status_threads_connected
+  {'__name__': 'mysql_global_status_threads_connected', 'instance': 'mysqld-exporter:9104', 'job': 'mysql'}: [1791697125.169, '1']
+
+=== 4. Grafana Health & Data Sources via HTTPS ===
+HTTP/1.1 200 OK
+Datasource: Prometheus | Type: prometheus | URL: http://prometheus:9090 | Default: True
+
+Provisioned Dashboards:
+- Title: Gym Monitoring | UID: bg0vlg2zro0lcf | URL: /grafana/dashboards/f/bg0vlg2zro0lcf/gym-monitoring
+- Title: GYM - Containers | UID: gym-containers | URL: /grafana/d/gym-containers/gym-containers
+- Title: GYM - MySQL | UID: gym-mysql | URL: /grafana/d/gym-mysql/gym-mysql
+- Title: GYM - Nginx | UID: gym-nginx | URL: /grafana/d/gym-nginx/gym-nginx
+
+=== 5. Load Generation ===
+Successfully generated 200 HTTP requests to exercise web server and metrics.
