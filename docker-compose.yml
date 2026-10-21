@@ -48,7 +48,6 @@ services:
     networks:
       - frontend
       - backend
-      - monitoring
 
   phpmyadmin:
     image: phpmyadmin:5.2.1

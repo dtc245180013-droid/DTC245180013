@@ -10,8 +10,21 @@
   "liveNow": false,
   "panels": [
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
       "title": "Container CPU Usage (%)",
       "type": "timeseries",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth"
+          },
+          "unit": "percent"
+        }
+      },
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -20,15 +33,32 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(container_cpu_usage_seconds_total{name=~\"gym_.*\"}[1m])) by (name) * 100",
-          "legendFormat": "{{name}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_service!=\"\"}[1m])) by (container_label_com_docker_compose_service) * 100",
+          "legendFormat": "{{container_label_com_docker_compose_service}}",
           "refId": "A"
         }
       ]
     },
     {
-      "title": "Container RAM Usage (Bytes)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "title": "Container Memory Usage",
       "type": "timeseries",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth"
+          },
+          "unit": "bytes"
+        }
+      },
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -37,15 +67,32 @@
       },
       "targets": [
         {
-          "expr": "container_memory_usage_bytes{name=~\"gym_.*\"}",
-          "legendFormat": "{{name}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(container_memory_usage_bytes{container_label_com_docker_compose_service!=\"\"}) by (container_label_com_docker_compose_service)",
+          "legendFormat": "{{container_label_com_docker_compose_service}}",
           "refId": "A"
         }
       ]
     },
     {
-      "title": "Container Network Receive (Bytes/s)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "title": "Network Traffic Received (Rx)",
       "type": "timeseries",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth"
+          },
+          "unit": "Bps"
+        }
+      },
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -54,15 +101,32 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(container_network_receive_bytes_total{name=~\"gym_.*\"}[1m])) by (name)",
-          "legendFormat": "{{name}} rx",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(rate(container_network_receive_bytes_total{interface!=\"\"}[1m])) by (interface)",
+          "legendFormat": "{{interface}}",
           "refId": "A"
         }
       ]
     },
     {
-      "title": "Container Network Transmit (Bytes/s)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "title": "Network Traffic Transmitted (Tx)",
       "type": "timeseries",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth"
+          },
+          "unit": "Bps"
+        }
+      },
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -71,8 +135,12 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(container_network_transmit_bytes_total{name=~\"gym_.*\"}[1m])) by (name)",
-          "legendFormat": "{{name}} tx",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(rate(container_network_transmit_bytes_total{interface!=\"\"}[1m])) by (interface)",
+          "legendFormat": "{{interface}}",
           "refId": "A"
         }
       ]
@@ -93,5 +161,5 @@
   "timezone": "",
   "title": "GYM - Containers",
   "uid": "gym-containers",
-  "version": 1
+  "version": 2
 }

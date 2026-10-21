@@ -10,11 +10,15 @@
   "liveNow": true,
   "panels": [
     {
-      "title": "S\u1ed1 L\u1ea7n \u0110\u0103ng Nh\u1eadp Th\u1ea5t B\u1ea1i (LOGIN_FAILED) Theo Ph\u00fat",
-      "type": "timeseries",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "title": "Web App Access & Error Logs",
+      "type": "logs",
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 24,
         "x": 0,
         "y": 0
       },
@@ -22,45 +26,31 @@
         {
           "datasource": {
             "type": "loki",
-            "uid": "Loki"
+            "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"webapp\"} |= \"LOGIN_FAILED\" [1m]))",
-          "legendFormat": "L\u01b0\u1ee3t Th\u1ea5t B\u1ea1i / Ph\u00fat",
+          "expr": "{job=\"webapp\"}",
           "queryType": "range",
           "refId": "A"
         }
-      ]
+      ],
+      "options": {
+        "showLabels": false,
+        "wrapLogMessage": true,
+        "enableLogDetails": true,
+        "sortOrder": "Descending"
+      }
     },
     {
-      "title": "M\u00e3 Tr\u1ea1ng Th\u00e1i HTTP Nginx (Status Codes)",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "title": "Failed Logins Over Time (LOGIN_FAILED / min)",
       "type": "timeseries",
       "gridPos": {
         "h": 8,
         "w": 12,
-        "x": 12,
-        "y": 0
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "Loki"
-          },
-          "editorMode": "code",
-          "expr": "sum by (status) (count_over_time({job=\"nginx\"} | pattern `<ip> - <user> [<time>] \"<method> <uri> <proto>\" <status> <bytes> \"<referer>\" \"<agent>\" \"<forward>\" rt=<rt>` [1m]))",
-          "legendFormat": "HTTP {{status}}",
-          "queryType": "range",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "title": "Nh\u1eadt K\u00fd \u1ee8ng D\u1ee5ng Web (Real-time Logs)",
-      "type": "logs",
-      "gridPos": {
-        "h": 12,
-        "w": 24,
         "x": 0,
         "y": 8
       },
@@ -68,10 +58,63 @@
         {
           "datasource": {
             "type": "loki",
-            "uid": "Loki"
+            "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{job=\"webapp\"}",
+          "expr": "sum(count_over_time({job=\"webapp\"} |= \"LOGIN_FAILED\" [1m]))",
+          "legendFormat": "Failed Attempts / min",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "title": "Top HTTP Status Codes (Nginx)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum by (status) (rate(nginx_http_requests_total[1m]))",
+          "legendFormat": "HTTP {{status}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "title": "Nginx Access & Error Logs",
+      "type": "logs",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "editorMode": "code",
+          "expr": "{job=\"nginx\"}",
           "queryType": "range",
           "refId": "A"
         }
@@ -100,5 +143,5 @@
   "timezone": "",
   "title": "GYM - Logs",
   "uid": "gym-logs",
-  "version": 1
+  "version": 3
 }
