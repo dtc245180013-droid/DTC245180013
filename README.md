@@ -71,30 +71,64 @@ graph TD
 
 ```text
 gym/
-├── .env.example              # Tệp mẫu khai báo biến môi trường
-├── .gitignore                # Khai báo loại trừ tệp bí mật khỏi Git
-├── docker-compose.yml        # Cấu hình khởi chạy toàn bộ 12 dịch vụ container
-├── README.md                 # Tài liệu hướng dẫn hệ thống
-├── alert-sink/               # Phân hệ Webhook tiếp nhận cảnh báo sự cố
-│   ├── Dockerfile
-│   └── server.py
-├── db/                       # Khởi tạo CSDL MySQL (7 bảng nghiệp vụ Gym)
-│   └── init.sql
-├── nginx/                    # Cấu hình Reverse Proxy, SSL HTTPS và Rate Limit
-│   ├── certs/
-│   └── nginx.conf
-├── prometheus/               # Cấu hình thu thập chỉ số giám sát hệ thống
-│   └── prometheus.yml
-├── grafana/                  # Cấu hình Datasources và 4 Dashboards giám sát
+├── .env.example                     # File mẫu khai báo các biến môi trường và mật khẩu
+├── .gitignore                       # Danh sách các tệp tin loại trừ khỏi Git (file .env, SSL key)
+├── docker-compose.yml               # Cấu hình khởi chạy tập trung 12 dịch vụ multi-container
+├── README.md                        # Tài liệu hướng dẫn kiến trúc và vận hành hệ thống
+├── alert-sink/                      # Phân hệ Webhook tiếp nhận cảnh báo sự cố an ninh
+│   ├── Dockerfile                   # Dockerfile xây dựng container Python Alert-Sink
+│   └── server.py                    # Server HTTP ghi nhận payload cảnh báo từ Grafana
+├── db/                              # Cơ sở dữ liệu MySQL
+│   └── init.sql                     # Script khởi tạo 7 bảng quan hệ và nạp dữ liệu mẫu tiếng Việt
+├── docs/                            # Tài liệu báo cáo và phân tích sự cố
+│   ├── cho-bao-cao.md               # Hướng dẫn chi tiết 17 ảnh chụp minh chứng & văn phong báo cáo
+│   └── su-co-bruteforce.md          # Báo cáo điều tra sự cố tấn công Brute-force (Incident Post-Mortem)
+├── evidence/                        # Thư mục lưu trữ 7 tệp minh chứng thực thi từng bước
+│   ├── buoc0-moitruong.txt          # Minh chứng khảo sát phần cứng VM, Docker và Git ban đầu
+│   ├── buoc12-web-db.txt            # Minh chứng CSDL 7 bảng, tài khoản và kiểm tra Web/DB
+│   ├── buoc3-nginx.txt              # Minh chứng cấu hình Nginx SSL, 301 redirect và Security Headers
+│   ├── buoc4-giamsat.txt            # Minh chứng 4 Prometheus targets UP và Grafana dashboards
+│   ├── buoc5-logql.txt              # Minh chứng kết quả thực tế 4 câu truy vấn LogQL qua Loki API
+│   ├── buoc5-sucodo.txt             # Minh chứng cảnh báo Firing và Webhook JSON nhận được
+│   └── buoc6-hardening.txt          # Minh chứng gia cố bảo mật mạng 3 lớp, quyền CSDL, UFW Firewall
+├── exporter/                        # Cấu hình kết nối cho các Exporter
+│   └── .my.cnf                      # Thông tin xác thực riêng biệt cho mysqld-exporter
+├── grafana/                         # Cấu hình tự động nạp dữ liệu cho Grafana (Provisioning)
 │   └── provisioning/
-├── loki/                     # Cấu hình hệ thống lưu trữ log tập trung
+│       ├── alerting/                # Quy tắc cảnh báo (Alert Rules) và Contact Points webhook
+│       │   └── alerting.yaml
+│       ├── dashboards/              # 4 Dashboard mẫu tự động nạp (Containers, Nginx, MySQL, Logs)
+│       └── datasources/             # Tự động kết nối Prometheus và Loki datasources
+│           ├── datasource.yml
+│           └── loki.yaml
+├── loki/                            # Cấu hình hệ thống thu thập log Grafana Loki
 │   └── loki-config.yaml
-├── promtail/                 # Cấu hình thu thập nhật ký từ các container
-│   └── promtail-config.yaml
-├── scripts/                  # Scripts kiểm tra hồi quy và mô phỏng sự cố
-└── web/                      # Phân hệ Web Quản lý Phòng Gym (PHP 8.2)
-    ├── Dockerfile
-    └── src/                  # Mã nguồn giao diện và xử lý nghiệp vụ
+├── nginx/                           # Cấu hình Nginx Reverse Proxy
+│   ├── certs/                       # Chứng chỉ số SSL X.509 tự ký (server.crt, server.key)
+│   ├── gen-cert.sh                  # Script OpenSSL tự động tạo chứng chỉ SSL có SAN IP
+│   └── nginx.conf                   # Cấu hình Reverse Proxy, TLS 1.2/1.3, đóng cổng phụ và Security Headers
+├── prometheus/                      # Cấu hình hệ thống thu thập số liệu Prometheus
+│   └── prometheus.yml               # Cấu hình các Job giám sát (cadvisor, nginx, mysql, prometheus)
+├── promtail/                        # Cấu hình Promtail Log Shipper
+│   └── promtail-config.yaml         # Cấu hình quét Docker container socket và gán nhãn tự động
+├── scripts/                         # Các script hỗ trợ vận hành và kiểm thử tự động
+│   ├── gen_logql_evidence.py        # Script chạy và trích xuất kết quả 4 truy vấn LogQL
+│   ├── harden_db.sql                # Script giới hạn đặc quyền tối thiểu cho CSDL MySQL
+│   ├── simulate_bruteforce.sh       # Kịch bản giả lập tấn công Brute-force tự động
+│   └── test_logql.py                # Script kiểm tra kết nối API Loki
+└── web/                             # Mã nguồn ứng dụng Quản lý Phòng Gym (PHP 8.2 Apache)
+    ├── Dockerfile                   # Dockerfile ứng dụng web với cấu hình ẩn version banner
+    └── src/                         # Mã nguồn PHP thuần chuẩn PDO, phân quyền 3 vai trò
+        ├── config.php               # Kết nối CSDL bảo mật và khởi tạo phiên làm việc CSRF
+        ├── header.php               # Thanh điều hướng Navbar Bootstrap 5 chuẩn giao diện tiếng Việt
+        ├── footer.php               # Chân trang bản quyền và thư viện JavaScript
+        ├── login.php                # Form đăng nhập bảo mật và ghi nhận log LOGIN_FAILED ra stderr
+        ├── logout.php               # Đăng xuất và hủy phiên làm việc an toàn
+        ├── manager.php              # Bảng điều khiển Quản lý (CRUD, Báo cáo, Gia hạn, Xuất biên lai)
+        ├── trainer.php              # Bảng điều khiển Huấn luyện viên (Lịch dạy, Điểm danh học viên)
+        ├── member.php               # Bảng điều khiển Hội viên (Gói tập, Đặt/hủy chỗ SELECT FOR UPDATE)
+        ├── health.php               # Endpoint kiểm tra sức khỏe hệ thống (Health Check)
+        └── custom.css               # Tùy biến phong cách giao diện bo góc hiện đại
 ```
 
 ---
