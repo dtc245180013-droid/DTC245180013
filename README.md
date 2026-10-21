@@ -71,30 +71,30 @@ graph TD
 
 ```text
 gym/
-â”œâ”€â”€ .env.example              # Tá»‡p máº«u khai bÃ¡o biáº¿n mÃ´i trÆ°á»ng
-â”œâ”€â”€ .gitignore                # Khai bÃ¡o loáº¡i trá»« tá»‡p bÃ­ máº­t khá»i Git
-â”œâ”€â”€ docker-compose.yml        # Cáº¥u hÃ¬nh khá»Ÿi cháº¡y toÃ n bá»™ 12 dá»‹ch vá»¥ container
-â”œâ”€â”€ README.md                 # TÃ i liá»‡u hÆ°á»›ng dáº«n há»‡ thá»‘ng
-â”œâ”€â”€ alert-sink/               # PhÃ¢n há»‡ Webhook tiáº¿p nháº­n cáº£nh bÃ¡o sá»± cá»‘
-â”‚   â”œâ”€â”€ Dockerfile
-â”‚   â””â”€â”€ server.py
-â”œâ”€â”€ db/                       # Khá»Ÿi táº¡o CSDL MySQL (7 báº£ng nghiá»‡p vá»¥ Gym)
-â”‚   â””â”€â”€ init.sql
-â”œâ”€â”€ nginx/                    # Cáº¥u hÃ¬nh Reverse Proxy, SSL HTTPS vÃ  Rate Limit
-â”‚   â”œâ”€â”€ certs/
-â”‚   â””â”€â”€ nginx.conf
-â”œâ”€â”€ prometheus/               # Cáº¥u hÃ¬nh thu tháº­p chá»‰ sá»‘ giÃ¡m sÃ¡t há»‡ thá»‘ng
-â”‚   â””â”€â”€ prometheus.yml
-â”œâ”€â”€ grafana/                  # Cáº¥u hÃ¬nh Datasources vÃ  4 Dashboards giÃ¡m sÃ¡t
-â”‚   â””â”€â”€ provisioning/
-â”œâ”€â”€ loki/                     # Cáº¥u hÃ¬nh há»‡ thá»‘ng lÆ°u trá»¯ log táº­p trung
-â”‚   â””â”€â”€ loki-config.yaml
-â”œâ”€â”€ promtail/                 # Cáº¥u hÃ¬nh thu tháº­p nháº­t kÃ½ tá»« cÃ¡c container
-â”‚   â””â”€â”€ promtail-config.yaml
-â”œâ”€â”€ scripts/                  # Scripts kiá»ƒm tra há»“i quy vÃ  mÃ´ phá»ng sá»± cá»‘
-â””â”€â”€ web/                      # PhÃ¢n há»‡ Web Quáº£n lÃ½ PhÃ²ng Gym (PHP 8.2)
-    â”œâ”€â”€ Dockerfile
-    â””â”€â”€ src/                  # MÃ£ nguá»“n giao diá»‡n vÃ  xá»­ lÃ½ nghiá»‡p vá»¥
+├── .env.example              # Tệp mẫu khai báo biến môi trường
+├── .gitignore                # Khai báo loại trừ tệp bí mật khỏi Git
+├── docker-compose.yml        # Cấu hình khởi chạy toàn bộ 12 dịch vụ container
+├── README.md                 # Tài liệu hướng dẫn hệ thống
+├── alert-sink/               # Phân hệ Webhook tiếp nhận cảnh báo sự cố
+│   ├── Dockerfile
+│   └── server.py
+├── db/                       # Khởi tạo CSDL MySQL (7 bảng nghiệp vụ Gym)
+│   └── init.sql
+├── nginx/                    # Cấu hình Reverse Proxy, SSL HTTPS và Rate Limit
+│   ├── certs/
+│   └── nginx.conf
+├── prometheus/               # Cấu hình thu thập chỉ số giám sát hệ thống
+│   └── prometheus.yml
+├── grafana/                  # Cấu hình Datasources và 4 Dashboards giám sát
+│   └── provisioning/
+├── loki/                     # Cấu hình hệ thống lưu trữ log tập trung
+│   └── loki-config.yaml
+├── promtail/                 # Cấu hình thu thập nhật ký từ các container
+│   └── promtail-config.yaml
+├── scripts/                  # Scripts kiểm tra hồi quy và mô phỏng sự cố
+└── web/                      # Phân hệ Web Quản lý Phòng Gym (PHP 8.2)
+    ├── Dockerfile
+    └── src/                  # Mã nguồn giao diện và xử lý nghiệp vụ
 ```
 
 ---
