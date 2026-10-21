@@ -7,7 +7,7 @@
 ## 📌 THÔNG TIN SINH VIÊN THỰC HIỆN
 - **Họ và tên sinh viên:** **Trần Thị Thu Huyền**
 - **Mã số sinh viên (MSSV):** **DTC245180013**
-- **Lớp:** **CNTT K23C**
+- **Lớp / Khóa:** **CNTT K23C**
 - **Email:** `dtc245180013@ictu.edu.vn`
 - **Tài khoản GitHub:** [`dtc245180013-droid`](https://github.com/dtc245180013-droid)
 - **Repository:** [`https://github.com/dtc245180013-droid/DTC245180013`](https://github.com/dtc245180013-droid/DTC245180013)
